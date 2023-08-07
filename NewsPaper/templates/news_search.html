@@ -1,0 +1,71 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+{% load custom_tags %}
+
+{% block title %}
+news_searching
+{% endblock title %}
+
+{% block content %}
+<h1>Поиск новости/статьи</h1>
+
+ <form action="" method="get">
+       {{ filterset.form.as_p }}
+<!--      <label for="meeting-time">Выберете время создания новости:</label>-->
+
+<!--        <input type="datetime-local" id="meeting-time"-->
+<!--        name="meeting-time" value="2023-04-07T00:00"-->
+<!--        min="2023-04-07T00:00" max="2222-12-31T00:00">-->
+
+       <input type="submit" value="Найти" />
+ </form>
+
+ <hr>
+   {% if search %}
+       <table>
+           <tr>
+               <td>Заголовок</td>
+               <td>Дата публикации</td>
+               <td>Автор</td>
+               <td>Категория</td>
+               <td>Содержание</td>
+           </tr>
+
+           {% for news in search %}
+           <tr>
+               <td>{{ news.title|censor }}</td>
+               <td>{{ news.addTime|date:'d M Y'}}</td>
+               <td>{{ news.author }}</td>
+               <td>{% for cat in news.postCategory.all %}
+                    {{ cat.categoryName }}
+                     {% endfor %}
+                </td>
+               <td>{{ news.content|truncatechars:20|censor }}</td>
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>Статей и новостей нет!</h2>
+   {% endif %}
+
+   {% if page_obj.has_previous %}
+
+       <a href="?{% url_replace page=1 %}" >1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
+{% endblock content %}
